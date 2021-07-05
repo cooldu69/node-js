@@ -80,6 +80,7 @@ return`${hours}:${minutes}:${seconds}`
   await password_input.type("MAT06BRO")
   await page.click("#login")
   await page.waitFor(4000)
+  await page.goto('https://www.jeu.princedelu.fr/functions/insert-code.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
     try {
