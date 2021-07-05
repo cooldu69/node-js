@@ -13,7 +13,7 @@ var bad_code = 0;
 var _THREAD = 5
 var start_time = new Date().getTime();
 var captchat = true;
-var headless_mode = true;
+var headless_mode = false;
 
 async function add_code(text){
   const path = './goo_code.txt'
@@ -165,7 +165,7 @@ if(reponse){
     site_request(page, browser);
   }else{
     captchat = false;
-    console.log("Mauvais code captcha")
+    console.log("Mauvais code captcha, veuillez relancer le bot")
     try {
       page.close();
       browser.close();
