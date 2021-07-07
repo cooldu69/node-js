@@ -11,9 +11,9 @@ var code = "";
 var good_code = 0;
 var bad_code = 0;
 var _THREAD = 5
-var start_time = new Date().getTime();
+var start_time = Date.now()
 var captchat = true;
-var headless_mode = false;
+var headless_mode = true;
 
 async function add_code(text){
   const path = './goo_code.txt'
@@ -34,15 +34,56 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+
+//function generate_code(){
+//  const list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//  var final_code = "";
+//  for (let i = 0; i < 10; i++) {
+//    const element = list[getRandomInt(62)];
+//    final_code = final_code + element;
+//  }
+//  return final_code;
+//}
+
+
 function generate_code(){
-  const list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var final_code = "";
-  for (let i = 0; i < 10; i++) {
-    const element = list[getRandomInt(62)];
-    final_code = final_code + element;
+  var uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var number = "0123456789";
+  var tiny = "abcdefghijklmnopqrstuvwxyz";
+  var choice_1 = ["4", "5"];
+  var choice_2 = ["1", "2"];
+  var uppercase_number = choice_1[getRandomInt(2)];
+  var number_number = choice_2[getRandomInt(2)]
+  var tiny_number = 10 - (parseInt(uppercase_number) + parseInt(number_number))
+  var num_number = 0
+  var num_uppercase = 0
+  var num_tiny = 0
+  function add_uppercase(){
+      if(num_uppercase < parseInt(uppercase_number)){
+          final_code = final_code + uppercase[getRandomInt(26)];
+          num_uppercase = num_uppercase + 1
+      }
+  }
+  function add_number(){
+      if(num_number < parseInt(number_number)){
+          final_code = final_code + number[getRandomInt(10)];
+          num_number = num_number + 1
+      }
+  }
+  function add_tiny(){
+      if(num_tiny < tiny_number){
+      final_code = final_code +  tiny[getRandomInt(10)];
+      num_tiny = num_tiny + 1
+      }
+  }
+  while (final_code.length != 10){
+      var func = [add_uppercase(), add_number(), add_tiny()]
+      func[getRandomInt(3)] 
   }
   return final_code;
 }
+
 
 var bcolors = {
   HEADER : '\033[95m',
@@ -56,12 +97,13 @@ var bcolors = {
 }  
 
 function getRuntime(){
-var milliseconds = Date.now() - start_time
-const hours = `0${new Date(milliseconds).getHours() - 1}`.slice(-2);
-const minutes = `0${new Date(milliseconds).getMinutes()}`.slice(-2);
-const seconds = `0${new Date(milliseconds).getSeconds()}`.slice(-2);
-return`${hours}:${minutes}:${seconds}`
-}
+  var milliseconds = Date.now() - start_time
+  const day = `0${new Date(milliseconds).getDate() - 1}`.slice(-2);
+  const hours = `0${new Date(milliseconds).getHours() - 1}`.slice(-2);
+  const minutes = `0${new Date(milliseconds).getMinutes()}`.slice(-2);
+  const seconds = `0${new Date(milliseconds).getSeconds()}`.slice(-2);
+  return`${day}:${hours}:${minutes}:${seconds}`
+  }
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -80,7 +122,6 @@ return`${hours}:${minutes}:${seconds}`
   await password_input.type("MAT06BRO")
   await page.click("#login")
   await page.waitFor(4000);
-  await page.goto('https://www.jeu.princedelu.fr/functions/insert-code.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
     try {
