@@ -80,7 +80,6 @@ function generate_code(){
               num_number = num_number + 2;
           }
         }
-
   }
   }
   function add_tiny(){
@@ -131,9 +130,10 @@ function getRuntime(){
   const username_input = await page.$('#email');
   const password_input = await page.$('#pass-word');
   await username_input.type("matthisplusvite@gmail.com")
-  await password_input.type("MAT06BRO")
+  await password_input.type("")
   await page.click("#login")
   await page.waitFor(4000);
+  await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
     try {
