@@ -66,10 +66,22 @@ function generate_code(){
       }
   }
   function add_number(){
-      if(num_number < parseInt(number_number)){
+      //if(num_number < parseInt(number_number)){
+      //    final_code = final_code + number[getRandomInt(10)];
+      //    num_number = num_number + 1
+      //}
+      if(num_number < parseInt(number_number) && getRandomInt(3) == 1){
+        if(parseInt(number_number) == 1){
           final_code = final_code + number[getRandomInt(10)];
-          num_number = num_number + 1
-      }
+          num_number = num_number + 1;
+        }else{
+          if(parseInt(number_number) == 2){
+              final_code = final_code + number[getRandomInt(10)] + number[getRandomInt(10)];
+              num_number = num_number + 2;
+          }
+        }
+
+  }
   }
   function add_tiny(){
       if(num_tiny < tiny_number){
