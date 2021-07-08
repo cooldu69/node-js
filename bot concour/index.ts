@@ -97,7 +97,6 @@ function generate_code(){
   return final_code;
 }
 
-
 var bcolors = {
   HEADER : '\033[95m',
   OKBLUE : '\033[94m',
@@ -129,12 +128,32 @@ function getRuntime(){
   });
   const page = await browser.newPage();
   await page.goto('https://www.jeu.princedelu.fr/index.php?authMode=login');
-  const username_input = await page.$('#email');
-  const password_input = await page.$('#pass-word');
-  await username_input.type("matthisplusvite@gmail.com")
-  await password_input.type("")
-  await page.click("#login")
-  await page.waitFor(4000);
+  let LoginData = querystring.stringify({email: "MATTHISPLUSVITE@GMAIL.COM", password:""});
+  let User_Agent = randomUseragent.getRandom();
+  var reponse = await page.evaluate(async (LoginData, User_Agent) => {
+    return fetch("https://www.jeu.princedelu.fr/functions/auth/login.php", {
+      method: "POST",
+      body:  LoginData,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": User_Agent
+      }
+    }).then(reponse => reponse.json())
+  },LoginData, User_Agent)
+    if(reponse.error == true){
+      if(reponse.email_err != ' '){
+        console.log(reponse.email_err)
+      }
+      if(reponse.password_err != ' '){
+        console.log(reponse.password_err)
+      }
+      await page.close();
+      await browser.close();
+    }else{
+      if(reponse.error == false){
+        console.log(bcolors.OKGREEN + "Connection successful" + bcolors.ENDC);
+      }
+    }
   await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
@@ -148,6 +167,7 @@ function getRuntime(){
     'eng',
     { logger: m => console.log(m) }
   )
+  console.log(text)
   console.log("\nLoading...")
   if(new Boolean(headless_mode) == false){
     code = await text.slice(2, text.length).replace("\n", "").replace(" ", "");
@@ -222,10 +242,8 @@ if(reponse){
   }else{
     captchat = false;
     console.log("Mauvais code captcha, veuillez relancer le bot")
-    try {
-      page.close();
-      browser.close();
-    } catch {}
+    await page.close();
+    await browser.close();
 
   }
 }
