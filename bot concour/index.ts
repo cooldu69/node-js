@@ -16,7 +16,7 @@ var captchat = true;
 var headless_mode = true;
 
 async function add_code(text){
-  const path = './goo_code.txt'
+  const path = './good_code.txt'
   try {
     if (!fs.existsSync(path)) {
     fs.createWriteStream(path);
@@ -60,7 +60,8 @@ function generate_code(){
   var num_uppercase = 0
   var num_tiny = 0
   function add_uppercase(){
-      if(num_uppercase < parseInt(uppercase_number)){
+      // if(num_uppercase < parseInt(uppercase_number)){
+        if(num_uppercase < parseInt(uppercase_number) && getRandomInt(2) == 1){
           final_code = final_code + uppercase[getRandomInt(26)];
           num_uppercase = num_uppercase + 1
       }
@@ -70,7 +71,8 @@ function generate_code(){
       //    final_code = final_code + number[getRandomInt(10)];
       //    num_number = num_number + 1
       //}
-      if(num_number < parseInt(number_number) && getRandomInt(3) == 1){
+      // if(num_number < parseInt(number_number) && getRandomInt(3) == 1){
+        if(num_number < parseInt(number_number) && getRandomInt(4) == 1){
         if(parseInt(number_number) == 1){
           final_code = final_code + number[getRandomInt(10)];
           num_number = num_number + 1;
@@ -130,7 +132,7 @@ function getRuntime(){
   const username_input = await page.$('#email');
   const password_input = await page.$('#pass-word');
   await username_input.type("matthisplusvite@gmail.com")
-  await password_input.type("")
+  await password_input.type("MAT06BRO")
   await page.click("#login")
   await page.waitFor(4000);
   await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
@@ -171,7 +173,8 @@ async function menu(){
 
 async function site_request(page, browser){
 const User_Agent = randomUseragent.getRandom()
-let postData = querystring.stringify({ captcha: code, email: "MATTHISPLUSVITE@GMAIL.COM", code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
+let postData = querystring.stringify({captcha: code, email: "MATTHISPLUSVITE@GMAIL.COM", code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
+let postData_parse = querystring.parse(postData);
 var reponse = await page.evaluate(async (postData, User_Agent) => {
   return fetch("https://www.jeu.princedelu.fr/functions/insert-code.php", {
     method: "POST",
@@ -186,31 +189,31 @@ var reponse = await page.evaluate(async (postData, User_Agent) => {
 if(reponse){
   if(reponse.captcha_err == ""){
   if(reponse.code_err_1 == "Bravo vous avez saisi le bon code!" || reponse.code_err_1 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code(postData.code_1)
+      add_code("Code : " + postData_parse.code_1 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_2 == "Bravo vous avez saisi le bon code!" || reponse.code_err_2 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code(postData.code_2)
+      add_code("Code : " + postData_parse.code_2 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_3 == "Bravo vous avez saisi le bon code!" || reponse.code_err_3 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code(postData.code_3)
+      add_code("Code : " + postData_parse.code_3 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_4 == "Bravo vous avez saisi le bon code!" || reponse.code_err_4 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code(postData.code_4)
+      add_code("Code : " + postData_parse.code_4 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_5 == "Bravo vous avez saisi le bon code!" || reponse.code_err_5 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code(postData.code_5)
+      add_code("Code : " + postData_parse.code_5 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
     }else{
       bad_code ++
