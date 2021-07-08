@@ -132,7 +132,7 @@ function getRuntime(){
   const username_input = await page.$('#email');
   const password_input = await page.$('#pass-word');
   await username_input.type("matthisplusvite@gmail.com")
-  await password_input.type("MAT06BRO")
+  await password_input.type("")
   await page.click("#login")
   await page.waitFor(4000);
   await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
