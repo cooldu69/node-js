@@ -12,7 +12,7 @@ var bad_code = 0;
 var _THREAD = 5
 var start_time = Date.now()
 var captchat = true;
-var headless_mode = false;
+var headless_mode = true;
 
 async function add_code(text){
   const path = './good_code.txt'
