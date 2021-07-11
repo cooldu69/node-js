@@ -12,7 +12,7 @@ var bad_code = 0;
 var _THREAD = 5
 var start_time = Date.now()
 var captchat = true;
-var headless_mode = true;
+var headless_mode = false;
 
 async function add_code(text){
   const path = './good_code.txt'
@@ -159,8 +159,6 @@ function getRuntime(){
         console.log(bcolors.OKGREEN + "Connection successful" + bcolors.ENDC);
       }
     }
-  const page2 = await browser.newPage();
-  await page2.goto('https://www.jeu.princedelu.fr/confirmation-participation.php');
   await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
@@ -183,7 +181,7 @@ function getRuntime(){
   }
   menu();
   for (let i = 0; i < _THREAD; i++) {
-    await site_request(page, page2, browser);
+    await site_request(page, browser);
   }
 })();
 
@@ -198,14 +196,14 @@ async function menu(){
 }
 
 
-async function confirm_code(page2){
-  await page2.evaluate(() => {
-      location.reload(true)
-  })
+async function confirm_code(browser){
+  const page2 = await browser.newPage();
+  await page2.goto('https://www.jeu.princedelu.fr/confirmation-participation.php');
+  await page2.close();
 }
 
 
-async function site_request(page, page2, browser){
+async function site_request(page, browser){
 const User_Agent = randomUseragent.getRandom()
 let postData = querystring.stringify({captcha: code, email: "MATTHISPLUSVITE@GMAIL.COM", code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
 let postData_parse = querystring.parse(postData);
@@ -224,44 +222,43 @@ if(reponse){
   if(reponse.captcha_err == ""){
   if(reponse.code_err_1 == "Bravo vous avez saisi le bon code!" || reponse.code_err_1 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
       add_code("Code : " + postData_parse.code_1 + ", Reponse : " + JSON.stringify(reponse));
-      confirm_code(page2);
+      confirm_code(browser);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_2 == "Bravo vous avez saisi le bon code!" || reponse.code_err_2 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
       add_code("Code : " + postData_parse.code_2 + ", Reponse : " + JSON.stringify(reponse));
-      confirm_code(page2);
+      confirm_code(browser);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_3 == "Bravo vous avez saisi le bon code!" || reponse.code_err_3 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
       add_code("Code : " + postData_parse.code_3 + ", Reponse : " + JSON.stringify(reponse));
-      confirm_code(page2);
+      confirm_code(browser);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_4 == "Bravo vous avez saisi le bon code!" || reponse.code_err_4 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
       add_code("Code : " + postData_parse.code_4 + ", Reponse : " + JSON.stringify(reponse));
-      confirm_code(page2);
+      confirm_code(browser);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_5 == "Bravo vous avez saisi le bon code!" || reponse.code_err_5 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
       add_code("Code : " + postData_parse.code_5 + ", Reponse : " + JSON.stringify(reponse));
-      confirm_code(page2);
+      confirm_code(browser);
       good_code ++
     }else{
       bad_code ++
     }
-    site_request(page, page2, browser);
+    site_request(page, browser);
   }else{
     captchat = false;
     console.log("Mauvais code captcha, veuillez relancer le bot")
-    await page2.close();
     await page.close();
     await browser.close();
 
