@@ -1,4 +1,3 @@
-
 const puppeteer = require('puppeteer');
 const randomUseragent = require('random-useragent');
 const tesseract = require('tesseract.js');
@@ -71,8 +70,8 @@ function generate_code(){
       //    final_code = final_code + number[getRandomInt(10)];
       //    num_number = num_number + 1
       //}
-      // if(num_number < parseInt(number_number) && getRandomInt(3) == 1){
-        if(num_number < parseInt(number_number) && getRandomInt(4) == 1){
+      // if(num_number < parseInt(number_number) && getRandomInt(4) == 1){
+        if(num_number < parseInt(number_number) && getRandomInt(3) == 1){
         if(parseInt(number_number) == 1){
           final_code = final_code + number[getRandomInt(10)];
           num_number = num_number + 1;
@@ -110,10 +109,16 @@ var bcolors = {
 
 function getRuntime(){
   var milliseconds = Date.now() - start_time
-  const day = `0${new Date(milliseconds).getDate() - 1}`.slice(-2);
-  const hours = `0${new Date(milliseconds).getHours() - 1}`.slice(-2);
-  const minutes = `0${new Date(milliseconds).getMinutes()}`.slice(-2);
-  const seconds = `0${new Date(milliseconds).getSeconds()}`.slice(-2);
+  var day = `0${new Date(milliseconds).getDate() - 1}`.slice(-2);
+  var hours = `0${new Date(milliseconds).getHours() - 1}`.slice(-2);
+  var minutes = `0${new Date(milliseconds).getMinutes()}`.slice(-2);
+  var seconds = `0${new Date(milliseconds).getSeconds()}`.slice(-2);
+  if(day == '-1'){
+      day = "0";
+  }
+  if(hours == '-1'){
+      hours = '0'
+  }
   return`${day}:${hours}:${minutes}:${seconds}`
   }
 
@@ -154,6 +159,8 @@ function getRuntime(){
         console.log(bcolors.OKGREEN + "Connection successful" + bcolors.ENDC);
       }
     }
+  const page2 = await browser.newPage();
+  await page2.goto('https://www.jeu.princedelu.fr/confirmation-participation.php');
   await page.goto('https://www.jeu.princedelu.fr/saisie-code-unique.php');
   const elements = await page.$('.bloc-code')
   if (!fs.existsSync("./image")) {
@@ -176,10 +183,9 @@ function getRuntime(){
   }
   menu();
   for (let i = 0; i < _THREAD; i++) {
-    await site_request(page,browser);
+    await site_request(page, page2, browser);
   }
 })();
-
 
 async function menu(){
   console.clear();
@@ -191,7 +197,15 @@ async function menu(){
   }, 1000);
 }
 
-async function site_request(page, browser){
+
+async function confirm_code(page2){
+  await page2.evaluate(() => {
+      location.reload(true)
+  })
+}
+
+
+async function site_request(page, page2, browser){
 const User_Agent = randomUseragent.getRandom()
 let postData = querystring.stringify({captcha: code, email: "MATTHISPLUSVITE@GMAIL.COM", code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
 let postData_parse = querystring.parse(postData);
@@ -209,39 +223,45 @@ var reponse = await page.evaluate(async (postData, User_Agent) => {
 if(reponse){
   if(reponse.captcha_err == ""){
   if(reponse.code_err_1 == "Bravo vous avez saisi le bon code!" || reponse.code_err_1 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code("Code : " + postData_parse.code_1 + ", Reponse : " + JSON.stringify(reponse))
+      add_code("Code : " + postData_parse.code_1 + ", Reponse : " + JSON.stringify(reponse));
+      confirm_code(page2);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_2 == "Bravo vous avez saisi le bon code!" || reponse.code_err_2 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code("Code : " + postData_parse.code_2 + ", Reponse : " + JSON.stringify(reponse))
+      add_code("Code : " + postData_parse.code_2 + ", Reponse : " + JSON.stringify(reponse));
+      confirm_code(page2);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_3 == "Bravo vous avez saisi le bon code!" || reponse.code_err_3 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code("Code : " + postData_parse.code_3 + ", Reponse : " + JSON.stringify(reponse))
+      add_code("Code : " + postData_parse.code_3 + ", Reponse : " + JSON.stringify(reponse));
+      confirm_code(page2);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_4 == "Bravo vous avez saisi le bon code!" || reponse.code_err_4 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code("Code : " + postData_parse.code_4 + ", Reponse : " + JSON.stringify(reponse))
+      add_code("Code : " + postData_parse.code_4 + ", Reponse : " + JSON.stringify(reponse));
+      confirm_code(page2);
       good_code ++
     }else{
       bad_code ++
     }
     if(reponse.code_err_5 == "Bravo vous avez saisi le bon code!" || reponse.code_err_5 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas."){
-      add_code("Code : " + postData_parse.code_5 + ", Reponse : " + JSON.stringify(reponse))
+      add_code("Code : " + postData_parse.code_5 + ", Reponse : " + JSON.stringify(reponse));
+      confirm_code(page2);
       good_code ++
     }else{
       bad_code ++
     }
-    site_request(page, browser);
+    site_request(page, page2, browser);
   }else{
     captchat = false;
     console.log("Mauvais code captcha, veuillez relancer le bot")
+    await page2.close();
     await page.close();
     await browser.close();
 
