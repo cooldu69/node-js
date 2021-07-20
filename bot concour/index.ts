@@ -9,12 +9,12 @@ const fs = require("fs");
 var code = "";
 var good_code = 0;
 var bad_code = 0;
-var _THREAD = 5
-var start_time = Date.now()
+var _THREAD = 5;
+var start_time = Date.now();
 var captchat = true;
 var headless_mode = true;
-var email = "LEMESSAGERDU69@GMAIL.COM";
-var password = "matthis2003";
+var email = "";
+var password = "";
 
 async function add_code(text){
   const path = './good_code.txt'
@@ -79,8 +79,8 @@ function generate_code(){
             num_number = num_number + 1;
           }else{
             if(parseInt(number_number) == 2){
-                final_code = final_code + number[getRandomInt(10)] + number[getRandomInt(10)];
-                num_number = num_number + 2;
+                final_code = final_code + number[getRandomInt(10)];
+                num_number = num_number + 1;
             }
           }
     }
@@ -132,7 +132,7 @@ function getRuntime(){
       // '--proxy-server=' + proxy
     ],
     headless: headless_mode,
-    executablePath: '/usr/bin/chromium-browser'
+
   });
   const page = await browser.newPage();
   await page.goto('https://www.jeu.princedelu.fr/index.php?authMode=login');
@@ -197,7 +197,7 @@ async function connection(page){
 
 
 async function menu(){
-  console.clear()
+
   console.log(" <---------> GENERATOR CODE MONITOR <--------->\n\n" + "       Active Threads: " + bcolors.OKGREEN + _THREAD + bcolors.ENDC + " | Bad code: " + bcolors.FAIL +bad_code + bcolors.ENDC +  "\n      Codes Found: " + bcolors.OKGREEN + good_code + bcolors.ENDC + " | Runtime: " + bcolors.OKBLUE + getRuntime() + bcolors.ENDC +"\n\n" + "   <--------------------------------------->")
   setTimeout(() => {
     if(captchat == true){
@@ -207,68 +207,80 @@ async function menu(){
 }
 
 
-async function confirm_code(browser){
-    const page2 = await browser.newPage();
-    await page2.goto('https://www.jeu.princedelu.fr/confirmation-participation.php');
-    await page2.close();
+async function confirm_code(page){
+  let User_Agent = randomUseragent.getRandom();
+  return await page.evaluate(async (User_Agent) => {
+    return fetch("https://www.jeu.princedelu.fr/confirmation-participation.php", {
+      method: "GET",
+      headers: {
+        "User-Agent": User_Agent
+      }
+    }).then(reponse => reponse.text())
+  },User_Agent)
   }
 
   
 async function site_request(page, browser){
 const User_Agent = randomUseragent.getRandom()
-let postData = querystring.stringify({captcha: code, email: email, code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
+//let postData = querystring.stringify({captcha: code, email: email, code_1: generate_code(), code_2: generate_code(), code_3: generate_code(), code_4: generate_code(), code_5: generate_code()});
+let postData = querystring.stringify({captcha: code, email: email, code_1: generate_code()});
 let postData_parse = querystring.parse(postData);
-var reponse = await page.evaluate(async (postData, User_Agent) => {
-  return fetch("https://www.jeu.princedelu.fr/functions/insert-code.php", {
-    method: "POST",
-    body:  postData,
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "User-Agent": User_Agent
-    }
-    
-  }).then(reponse => reponse.json())
-},postData, User_Agent)
+try {
+  var reponse = await page.evaluate(async (postData, User_Agent) => {
+    return fetch("https://www.jeu.princedelu.fr/functions/insert-code.php", {
+      method: "POST",
+      body:  postData,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": User_Agent
+      }
+      
+    }).then(reponse => reponse.json())
+  },postData, User_Agent)
+} catch{
+  connection(page);
+  site_request(page, browser)
+}
 if(reponse){
   if(reponse.captcha_err == ""){
   if(reponse.code_err_1 == "Bravo vous avez saisi le bon code!"){
       add_code("Code : " + postData_parse.code_1 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
-      confirm_code(browser);
+      confirm_code(page);
     }else{
       bad_code ++
     }
-    if(reponse.code_err_2 == "Bravo vous avez saisi le bon code!"){
+
+   /*  if(reponse.code_err_2 == "Bravo vous avez saisi le bon code!"){
       add_code("Code : " + postData_parse.code_2 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
-      confirm_code(browser);
+      confirm_code(page);
     }else{
       bad_code ++
     }
     if(reponse.code_err_3 == "Bravo vous avez saisi le bon code!"){
       add_code("Code : " + postData_parse.code_3 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
-      confirm_code(browser);
+      confirm_code(page);
     }else{
       bad_code ++
     }
     if(reponse.code_err_4 == "Bravo vous avez saisi le bon code!"){
       add_code("Code : " + postData_parse.code_4 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
-      confirm_code(browser);
+      confirm_code(page);
     }else{
       bad_code ++
     }
     if(reponse.code_err_5 == "Bravo vous avez saisi le bon code!"){
       add_code("Code : " + postData_parse.code_5 + ", Reponse : " + JSON.stringify(reponse))
       good_code ++
-      confirm_code(browser);
+      confirm_code(page);
     }else{
-      bad_code ++
-    }
+      bad_code ++ 
+    }*/
     if(reponse.code_err_1 != "Ce code est d\u00e9j\u00e0 utilis\u00e9 ou n'existe pas." && reponse.code_err_1 != "Bravo vous avez saisi le bon code!"){
       connection(page);
-      
     }
     site_request(page, browser);
   }else{
