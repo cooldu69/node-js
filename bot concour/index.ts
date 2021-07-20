@@ -197,7 +197,7 @@ async function connection(page){
 
 
 async function menu(){
-
+  console.clear();
   console.log(" <---------> GENERATOR CODE MONITOR <--------->\n\n" + "       Active Threads: " + bcolors.OKGREEN + _THREAD + bcolors.ENDC + " | Bad code: " + bcolors.FAIL +bad_code + bcolors.ENDC +  "\n      Codes Found: " + bcolors.OKGREEN + good_code + bcolors.ENDC + " | Runtime: " + bcolors.OKBLUE + getRuntime() + bcolors.ENDC +"\n\n" + "   <--------------------------------------->")
   setTimeout(() => {
     if(captchat == true){
